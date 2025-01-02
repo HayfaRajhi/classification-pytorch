@@ -1,4 +1,4 @@
-name : CI workflow
+name: CI Workflow
 
 on:
   push:
@@ -7,21 +7,22 @@ on:
   pull_request:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Permissions to write to the repository using the token
-      permissions:
-        contents: write
-        pull-requests: write
-        repository-projects: write
-        id-token: write
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+      id-token: write
+
     steps:
       # Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Install uv (Universal Viewer) CLI like cond
+      # Install uv (Universal Viewer) CLI, similar to conda
       - name: Install uv
         uses: astral-sh/setup-uv@v2
 
@@ -35,23 +36,32 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt 
-      
-      #DVC
+          pip install -r requirements.txt
+
+      # DVC: Create credentials.json
       - name: Create credentials.json
         env:
-          GDRIVE_CREDENTIALS_dATA: ${{ secrets.GhubRIVE_CREDENTIALS_dATA }}
-        run: echo $GDRIVE_CREDENTIALS_dATA > credentials.json
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}  # Fix typo in secret name
+        run: echo "$GDRIVE_CREDENTIALS_DATA" > credentials.json
 
-      - name: Modify DVC Remote 
+      # Modify DVC Remote
+      - name: Modify DVC Remote
         run: |
           uv run dvc remote modify --local gdrive-remote gdrive_service_account_json_file_path credentials.json
 
-      - name: DVC Pull data
+      # DVC Pull Data
+      - name: DVC Pull Data
         run: |
-          uv run dvc pull -v 
-        
-          
+          uv run dvc pull -v
+
+      # Verify that the test data exists
+      - name: Verify test data directory
+        run: |
+          if [ ! -d "./data/test/sea" ]; then
+            echo "Directory ./data/test/sea does not exist!"
+            exit 1
+          fi
+
       # Run CNN Ship Filter Inference
       - name: Run tests
         run: |
