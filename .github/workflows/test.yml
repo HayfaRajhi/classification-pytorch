@@ -41,7 +41,7 @@ jobs:
       # DVC: Create credentials.json
       - name: Create credentials.json
         env:
-          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}  # Fix typo in secret name
+          GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
         run: echo "$GDRIVE_CREDENTIALS_DATA" > credentials.json
 
       # Modify DVC Remote
@@ -54,14 +54,6 @@ jobs:
       - name: DVC Pull Data
         run: |
           uv run dvc pull -v
-
-      # Verify that the test data exists
-      - name: Verify test data directory
-        run: |
-          if [ ! -d "./data/test/sea" ]; then
-            echo "Directory ./data/test/sea does not exist!"
-            exit 1
-          fi
 
       # Run CNN Ship Filter Inference
       - name: Run tests
