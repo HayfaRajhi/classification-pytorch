@@ -8,7 +8,7 @@ from torch.optim.lr_scheduler import StepLR
 import warnings
 from .utils import plot_loss_curves
 
-warnings.filter('ignore warnings')
+warnings.filterwarnings('ignore')
 def train_classifier(model, train_loader, val_loader, criterion, optimizer, num_epochs, model_dir, plot_dir, device,
                      backbone,
                      freeze_backbone):
