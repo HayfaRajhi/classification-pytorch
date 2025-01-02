@@ -65,7 +65,7 @@ def train_classifier(model, train_loader, val_loader, criterion, optimizer, num_
     mlflow.log_param("num_epochs", num_epochs)
     mlflow.log_param("learning_rate", optimizer.param_groups[0]['lr'])
     mlflow.log_param("backbone", backbone)
-    mlflow.log_param("frezee_backbone", freeze_backbone)
+    mlflow.log_param("freeze_backbone", freeze_backbone)
 
 
     for epoch in range(num_epochs):
