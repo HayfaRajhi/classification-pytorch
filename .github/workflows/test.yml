@@ -47,7 +47,7 @@ jobs:
       # Modify DVC Remote
       - name: Add DVC Remote for GDrive
         run: |
-          uv run dvc remote modify --local gdrive-remote gdrive_service_account_json_file credentials.json
+          uv run dvc remote modify --local gdrive_remote gdrive_service_account_json_file credentials.json
 
       # DVC Pull Data
       - name: DVC Pull Data
