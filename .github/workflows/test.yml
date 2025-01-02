@@ -26,11 +26,11 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v2
 
-      # Set up Python environment
+      # Set up Python environment with a newer version
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.9'
 
       # Install dependencies
       - name: Install dependencies
