@@ -1,13 +1,14 @@
 import logging
 import os
-
+import mlflow
+import mlflow.pytorch
 import torch
 from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import StepLR
-
+import warnings
 from .utils import plot_loss_curves
 
-
+warnings.filter('ignore warnings')
 def train_classifier(model, train_loader, val_loader, criterion, optimizer, num_epochs, model_dir, plot_dir, device,
                      backbone,
                      freeze_backbone):
@@ -57,6 +58,16 @@ def train_classifier(model, train_loader, val_loader, criterion, optimizer, num_
 
     model.to(device)  # Move model to the device
 
+    #start MLFlow run
+    mlflow.start_run()
+
+    # Log parameters
+    mlflow.log_param("num_epochs", num_epochs)
+    mlflow.log_param("learning_rate", optimizer.param_groups[0]['lr'])
+    mlflow.log_param("backbone", backbone)
+    mlflow.log_param("frezee_backbone", freeze_backbone)
+
+
     for epoch in range(num_epochs):
         # Training phase
         model.train()
@@ -78,9 +89,12 @@ def train_classifier(model, train_loader, val_loader, criterion, optimizer, num_
 
             total_train_loss += loss.item()
 
+        # Log loss to MLFlow
+        average_train_loss = total_train_loss / len(train_loader)
+        mlflow.log_metric("train_loss", average_train_loss)
+
         # Update learning rate
         scheduler.step()
-        average_train_loss = total_train_loss / len(train_loader)
         train_losses.append(average_train_loss)
 
         # Validation phase
@@ -109,11 +123,16 @@ def train_classifier(model, train_loader, val_loader, criterion, optimizer, num_
             # Save the best trained model
             filename = f'cnn_{backbone}_freeze_backbone_{freeze_backbone}'
             torch.save(model.state_dict(), os.path.join(model_dir, f"{filename}.pth"))
+            #log model to MLFlow
+            mlflow.pytorch.log_model(model,f"model_epoch_{epoch+1}")
         else:
             counter += 1
             if counter >= patience:
                 logging.info(f'Validation loss did not improve for the last {patience} epochs. Stopping early.')
                 break
+
+    # End MLFlow run
+    mlflow.end_run()
 
     # Plot loss curves
     plot_loss_curves(train_losses, val_losses, filename, plot_dir)

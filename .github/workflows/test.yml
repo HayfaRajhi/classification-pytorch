@@ -11,11 +11,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     # Permissions to write to the repository using the token
-    permissions:
-    contents: write
-    pull-requests: write
-    repository-projects: write
-    id-token: write
+      permissions:
+        contents: write
+        pull-requests: write
+        repository-projects: write
+        id-token: write
     steps:
       # Checkout the repository code
       - name: Checkout repository
@@ -40,7 +40,7 @@ jobs:
       #DVC
       - name: Create credentials.json
         env:
-          GDRIVE_CREDENTIALS_dATA: ${{ secrets.GDRIVE_CREDENTIALS_dATA }}
+          GDRIVE_CREDENTIALS_dATA: ${{ secrets.GhubRIVE_CREDENTIALS_dATA }}
         run: echo $GDRIVE_CREDENTIALS_dATA > credentials.json
 
       - name: Modify DVC Remote 
